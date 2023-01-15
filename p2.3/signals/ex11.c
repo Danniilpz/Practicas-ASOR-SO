@@ -2,24 +2,47 @@
 #include <signal.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <stdlib.h>
+
+#define handle_error(msg) \
+          do { perror(msg); exit(EXIT_FAILURE); } while (0)
+#define throw_error(msg) \
+          do { fprintf(stderr,"%s\n",msg); exit(EXIT_FAILURE); } while (0)
+
 
 int main(){
-    setenv("SLEEP_SECS","15",1);
+    if(setenv("SLEEP_SECS", "15", 1) == -1) handle_error("Error in setenv()");
+
     sigset_t blk_set;
-    sigemptyset(&blk_set);
-    sigaddset(&blk_set, SIGINT);	
-    sigaddset(&blk_set, SIGTSTP);	
-    sigprocmask(SIG_BLOCK, &blk_set, NULL);
-    sleep(atoi(getenv("SLEEP_SECS")));
+    if(sigemptyset(&blk_set) == -1) handle_error("Error in sigemptyset()");
+    if(sigaddset(&blk_set, SIGINT) == -1) handle_error("Error in sigaddset()");	
+    if(sigaddset(&blk_set, SIGTSTP) == -1) handle_error("Error in sigaddset()");	
+
+    if(sigprocmask(SIG_BLOCK, &blk_set, NULL) == -1) handle_error("Error in sigprocmask()");
+
+    char *sleep_secs;
+    if((sleep_secs = getenv("SLEEP_SECS")) == NULL) throw_error("SLEEP_SECS env variable not exists");
+
+    sleep(atoi(sleep_secs));
+
     sigset_t blk_pending;
-    sigpending(&blk_pending);
-    if(sigismember(&blk_pending,SIGINT)==1){
-        sigprocmask(SIG_UNBLOCK, &blk_set, NULL);
+    if(sigpending(&blk_pending) == -1) handle_error("Error in sigpending()");
+    if(sigismember(&blk_pending, SIGINT) == 1){
+        sigdelset(&blk_set, SIGINT);
     }
-    else if(sigismember(&blk_pending,SIGTSTP)==1){	
-        sigprocmask(SIG_UNBLOCK, &blk_set, NULL);
+    else{
+       printf("SIGINT not received"); 
+    } 
+    if(sigismember(&blk_pending,SIGTSTP) == 1){	
+        sigdelset(&blk_set, SIGTSTP);
     }
-    printf("Termina la ejecución\n");
+    else{
+       printf("SIGTSTP not received"); 
+    } 
+    
+    sigprocmask(SIG_UNBLOCK, &blk_set, NULL);
+
+    printf("Ending program\n");
 
     return 0;
 }

@@ -1,4 +1,8 @@
 #include <time.h>
+
 int main() {
-    printf("%li\n",time(NULL));
+
+    printf("Seconds since 1/1/1970 00:00:00 UTC: %li\n", time(NULL));
+
+    return 0;
 }

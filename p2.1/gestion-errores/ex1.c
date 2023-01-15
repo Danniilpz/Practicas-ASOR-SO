@@ -1,10 +1,12 @@
 #include <unistd.h>
 #include <stdio.h>
+#include <errno.h>
 
 int main() {
-   if(setuid(2)==0){
-	printf("%d",getuid());
+
+   if(setuid(0) == -1){
+	   perror("Error");
    }
-   else perror("ERROR");
-   return 0;
+
+   return 1;
 }
