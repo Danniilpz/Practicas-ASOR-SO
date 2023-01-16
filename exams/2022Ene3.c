@@ -1,3 +1,13 @@
+/*
+Escribe un programa que cree dos procesos y ejecute un comando en cada
+uno, de forma que la salida del primer comando sea la entrada del segundo. El proceso padre
+imprimirá el PID y el código de salida de cada proceso. El programa se ejecutará de la siguiente
+manera:
+$ ./conecta comando1 argumento1 comando2 argumento2
+Por ejemplo:
+$ ./conecta ls -l wc -c
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -40,7 +50,7 @@ int main(int argc, char *argv[]){
                     break;
                 case 0:                     
                     close(pipefd[0]);
-                    if(dup2(pipefd[1], 1) == -1) handle_error("Error in dup2()");
+                    if((dup2(pipefd[1], 1)) == -1) handle_error("Error in dup2()");
                     close(pipefd[1]);
 
                     if(execlp(argv[1], argv[1], argv[2], NULL) == -1) handle_error("Error in execlp()");
@@ -54,7 +64,8 @@ int main(int argc, char *argv[]){
                     waitpid(pid1, &status, 0);
                     printf("Child 1 - PID: %d - Status: %d\n", pid1, status);
                     waitpid(pid2, &status, 0);
-                    printf("Child 2 - PID: %d - Status: %d\n", pid2, status);                    
+                    printf("Child 2 - PID: %d - Status: %d\n", pid2, status); 
+
             }
     }
     return 0;

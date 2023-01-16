@@ -1,3 +1,10 @@
+    /*
+    Escribe un programa servidor UDP que escuche en una dirección (IPv4 o IPv6
+    en cualquier formato) y puerto dados como argumentos. Recibirá del cliente una ruta de fichero y le
+    devolverá una cadena con el tipo del fichero (regular, directorio, enlace, fifo u otro). Además, al
+    recibir cada mensaje imprimirá en el terminal la dirección y el puerto del cliente.
+    */
+    
     #include <sys/types.h>
     #include <stdio.h>
     #include <sys/stat.h>
@@ -36,13 +43,16 @@
         hints.ai_socktype = SOCK_DGRAM; /* Datagram socket */
         hints.ai_flags = AI_PASSIVE;    /* For wildcard IP address */
 
-        if((s = getaddrinfo(argv[1], argv[2], &hints, &rp))== -1)  handle_error_gai(s);
-        if((sfd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol)) ==-1) handle_error("error in socket");
+        if((s = getaddrinfo(argv[1], argv[2], &hints, &rp)) == -1)  handle_error_gai(s);
 
-        if(bind(sfd, rp->ai_addr, rp->ai_addrlen) ==-1)handle_error("error in bind");
+        if((sfd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol)) == -1) handle_error("error in socket");
+
+        if(bind(sfd, rp->ai_addr, rp->ai_addrlen) == -1)handle_error("error in bind");
 
         freeaddrinfo(rp);           /* No longer needed */
+
         addrlen=sizeof(addr);
+
         while(1){
             printf("Esperando conexiones UDP...\n");
 
@@ -66,8 +76,7 @@
             } else {
                 file_type="Other";
             }
-            sprintf(out,"File type: %s",file_type);
-            
+            sprintf(out,"File type: %s",file_type);            
 
             if (sendto(sfd, out, strlen(out), 0,(struct sockaddr *) &addr, addrlen) == -1) handle_error("Error in sendto");
         }

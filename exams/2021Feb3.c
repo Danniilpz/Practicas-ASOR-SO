@@ -1,3 +1,10 @@
+/*
+Escribe un programa que lea simultáneamente de una tubería con nombre,
+que existirá previamente en el directorio actual de trabajo y se llamará tuberia , y del terminal.
+● Imprimirá en el terminal los datos leídos y terminará tras 5 segundos sin recibir datos.
+● Al detectar el fin de fichero en la tubería, la cerrará y volverá a abrirla.
+*/
+
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/types.h>

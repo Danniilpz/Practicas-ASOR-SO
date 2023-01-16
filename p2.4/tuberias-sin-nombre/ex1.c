@@ -25,20 +25,20 @@ int main(int argc, char * argv[]){
             handle_error("Error in fork()");
             break;
         case 0: //Child
-            if(dup2(pipefd[0], 0) == -1) handle_error("Error in dup2()");
             close(pipefd[1]);
-
-            if(execlp(argv[3], argv[3], argv[4], (char *) NULL) == -1) handle_error("Error in execlp()");
-
+            if((dup2(pipefd[0], STDIN_FILENO)) == -1) handle_error("Error in dup2()");
             close(pipefd[0]);
+
+            if((execlp(argv[3], argv[3], argv[4], NULL)) == -1) handle_error("Error in execlp()");
+
             break;
-        case 1: //Parent
-            if(dup2(pipefd[1], 1) == -1) handle_error("Error in dup2()");
+        default: //Parent
             close(pipefd[0]);
-
-            if(execlp(argv[1], argv[1], argv[2], (char *) NULL) == -1) handle_error("Error in execlp()");
-
+            if((dup2(pipefd[1], STDOUT_FILENO)) == -1) handle_error("Error in dup2()");
             close(pipefd[1]);
+
+            if((execlp(argv[1], argv[1], argv[2], NULL)) == -1) handle_error("Error in execlp()");
+
             break;
     }
 
